@@ -281,7 +281,9 @@ public class SpeechRecognition extends CordovaPlugin {
     public void onError(int errorCode) {
       String errorMessage = getErrorText(errorCode);
       Log.d(LOG_TAG, "Error: " + errorMessage);
-      callbackContext.error(errorMessage);
+      if (errorCode != 7) { //7 = No Match, Google STT BUG
+        callbackContext.error(errorMessage);
+      }
     }
 
     @Override
@@ -317,13 +319,13 @@ public class SpeechRecognition extends CordovaPlugin {
     public void onResults(Bundle results) {
       ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
       Log.d(LOG_TAG, "SpeechRecognitionListener results: " + matches);
-      try {
-        JSONArray jsonMatches = new JSONArray(matches);
-        callbackContext.success(jsonMatches);
-      } catch (Exception e) {
-        e.printStackTrace();
-        callbackContext.error(e.getMessage());
-      }
+      // try {
+      //   JSONArray jsonMatches = new JSONArray(matches);
+      //   callbackContext.success(jsonMatches);
+      // } catch (Exception e) {
+      //   e.printStackTrace();
+      //   callbackContext.error(e.getMessage());
+      // }
     }
 
     @Override

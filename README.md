@@ -4,13 +4,44 @@
 ![Platform](https://img.shields.io/badge/platform-android%20%7C%20ios-lightgrey.svg)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=R7STJ6V2PNEMA)
 
-This is a cordova plugin for Speech Recognition.
+This is a cordova plugin (modified) for Speech Recognition, original: https://github.com/pbakondy/cordova-plugin-speechrecognition 
 
 
 ## Installation
 
 ```
-cordova plugin add cordova-plugin-speechrecognition
+cordova plugin add https://github.com/LavdenAbaddon/cordova-plugin-speechrecognition.git
+```
+
+## Modified parts
+
+In `/cordova-plugin-speechrecognition/src/android/com/pbakondy/SpeechRecognition.java`. 
+
+1. Google STT will return error code (no match) every recognition, which will interrupt recognition.
+ ```java
+    public void onError(int errorCode) {
+      String errorMessage = getErrorText(errorCode);
+      Log.d(LOG_TAG, "Error: " + errorMessage);
+      if (errorCode != 7) { //7 = No Match, Google STT BUG
+        callbackContext.error(errorMessage);
+      }
+    }
+```
+
+2. For processing result use, remove the codes in method `onResults`, because the `onPartialResults` would also provide the final result, which would cause recognize it twice.
+
+```java
+    public void onResults(Bundle results) {
+      ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+      Log.d(LOG_TAG, "SpeechRecognitionListener results: " + matches);
+      // try {
+      //   JSONArray jsonMatches = new JSONArray(matches);
+      //   callbackContext.success(jsonMatches);
+      // } catch (Exception e) {
+      //   e.printStackTrace();
+      //   callbackContext.error(e.getMessage());
+      // }
+    }
 ```
 
 ## Supported Platforms
